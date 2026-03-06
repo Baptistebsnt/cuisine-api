@@ -25,12 +25,10 @@ public class RecipeEntity {
     private Long authorId;
     private LocalDateTime createdAt;
 
-    @ElementCollection
-    @CollectionTable(name = "recipe_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
-    private List<IngredientEntity> ingredients;
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeIngredientEntity> ingredients;
 
-    @ElementCollection
-    @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StepEntity> steps;
 
     @PrePersist

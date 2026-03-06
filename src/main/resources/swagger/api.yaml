@@ -9,9 +9,43 @@ servers:
     description: Serveur local de développement
 
 paths:
+  /auth/register:
+    post:
+      summary: Inscription d'un nouvel utilisateur
+      operationId: registerUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationDTO'
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+  /auth/login:
+    post:
+      summary: Connexion et récupération du jeton JWT
+      operationId: loginUser
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginDTO'
+      responses:
+        '200':
+          description: Connexion réussie, retourne le JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDTO'
   /recipes:
     get:
-      summary: Lister toutes les recettes
+      summary: Lister toutes les recettes (Public)
       operationId: getAllRecipes
       tags:
         - Recipe
@@ -25,10 +59,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/RecipeDTO'
     post:
-      summary: Créer une nouvelle recette
+      summary: Créer une nouvelle recette (Protégé)
       operationId: createRecipe
       tags:
         - Recipe
+      security:
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -42,8 +78,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeDTO'
+        '401':
+          description: Non autorisé (Jeton manquant ou invalide)
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     RecipeDTO:
       type: object
@@ -105,3 +149,44 @@ components:
         instruction:
           type: string
           example: "Battre les oeufs dans un bol."
+
+    UserRegistrationDTO:
+      type: object
+      required:
+        - email
+        - password
+        - pseudo
+      properties:
+        email:
+          type: string
+          format: email
+          example: "chef@celtek.org"
+        password:
+          type: string
+          format: password
+          example: "MotDePasseSuperSecret123!"
+        pseudo:
+          type: string
+          example: "CeltekChef"
+
+    UserLoginDTO:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "chef@celtek.org"
+        password:
+          type: string
+          format: password
+          example: "MotDePasseSuperSecret123!"
+
+    AuthResponseDTO:
+      type: object
+      properties:
+        token:
+          type: string
+          description: "Le jeton JWT à envoyer dans les requêtes futures"
