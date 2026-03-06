@@ -4,26 +4,26 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "recipe_steps")
+@Table(name = "recipe_ingredients")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StepEntity {
+public class RecipeIngredientEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Lien vers la recette
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id")
     private RecipeEntity recipe;
 
-    @Column(name = "step_order")
-    private Integer stepOrder;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredient_id")
+    private IngredientEntity ingredient;
 
-    @Column(columnDefinition = "TEXT")
-    private String instruction;
+    private Double quantity;
+    private String unit;
 }
